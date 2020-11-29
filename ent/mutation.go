@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"ECDICT-GO/ent/ecdict"
 	"ECDICT-GO/ent/predicate"
 	"ECDICT-GO/ent/user"
 	"context"
@@ -21,8 +22,1153 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeUser = "User"
+	TypeEcdict = "Ecdict"
+	TypeUser   = "User"
 )
+
+// EcdictMutation represents an operation that mutate the Ecdicts
+// nodes in the graph.
+type EcdictMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	word          *string
+	sw            *string
+	phonetic      *string
+	definition    *string
+	translation   *string
+	pos           *string
+	collins       *int
+	addcollins    *int
+	oxford        *int
+	addoxford     *int
+	tag           *string
+	bnc           *int
+	addbnc        *int
+	frq           *int
+	addfrq        *int
+	exchange      *string
+	detail        *string
+	audio         *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Ecdict, error)
+	predicates    []predicate.Ecdict
+}
+
+var _ ent.Mutation = (*EcdictMutation)(nil)
+
+// ecdictOption allows to manage the mutation configuration using functional options.
+type ecdictOption func(*EcdictMutation)
+
+// newEcdictMutation creates new mutation for $n.Name.
+func newEcdictMutation(c config, op Op, opts ...ecdictOption) *EcdictMutation {
+	m := &EcdictMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeEcdict,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withEcdictID sets the id field of the mutation.
+func withEcdictID(id int) ecdictOption {
+	return func(m *EcdictMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Ecdict
+		)
+		m.oldValue = func(ctx context.Context) (*Ecdict, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Ecdict.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withEcdict sets the old Ecdict of the mutation.
+func withEcdict(node *Ecdict) ecdictOption {
+	return func(m *EcdictMutation) {
+		m.oldValue = func(context.Context) (*Ecdict, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m EcdictMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m EcdictMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *EcdictMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetWord sets the word field.
+func (m *EcdictMutation) SetWord(s string) {
+	m.word = &s
+}
+
+// Word returns the word value in the mutation.
+func (m *EcdictMutation) Word() (r string, exists bool) {
+	v := m.word
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWord returns the old word value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldWord(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldWord is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldWord requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWord: %w", err)
+	}
+	return oldValue.Word, nil
+}
+
+// ResetWord reset all changes of the "word" field.
+func (m *EcdictMutation) ResetWord() {
+	m.word = nil
+}
+
+// SetSw sets the sw field.
+func (m *EcdictMutation) SetSw(s string) {
+	m.sw = &s
+}
+
+// Sw returns the sw value in the mutation.
+func (m *EcdictMutation) Sw() (r string, exists bool) {
+	v := m.sw
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSw returns the old sw value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldSw(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSw is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSw requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSw: %w", err)
+	}
+	return oldValue.Sw, nil
+}
+
+// ResetSw reset all changes of the "sw" field.
+func (m *EcdictMutation) ResetSw() {
+	m.sw = nil
+}
+
+// SetPhonetic sets the phonetic field.
+func (m *EcdictMutation) SetPhonetic(s string) {
+	m.phonetic = &s
+}
+
+// Phonetic returns the phonetic value in the mutation.
+func (m *EcdictMutation) Phonetic() (r string, exists bool) {
+	v := m.phonetic
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhonetic returns the old phonetic value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldPhonetic(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPhonetic is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPhonetic requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhonetic: %w", err)
+	}
+	return oldValue.Phonetic, nil
+}
+
+// ResetPhonetic reset all changes of the "phonetic" field.
+func (m *EcdictMutation) ResetPhonetic() {
+	m.phonetic = nil
+}
+
+// SetDefinition sets the definition field.
+func (m *EcdictMutation) SetDefinition(s string) {
+	m.definition = &s
+}
+
+// Definition returns the definition value in the mutation.
+func (m *EcdictMutation) Definition() (r string, exists bool) {
+	v := m.definition
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDefinition returns the old definition value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldDefinition(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDefinition is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDefinition requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDefinition: %w", err)
+	}
+	return oldValue.Definition, nil
+}
+
+// ResetDefinition reset all changes of the "definition" field.
+func (m *EcdictMutation) ResetDefinition() {
+	m.definition = nil
+}
+
+// SetTranslation sets the translation field.
+func (m *EcdictMutation) SetTranslation(s string) {
+	m.translation = &s
+}
+
+// Translation returns the translation value in the mutation.
+func (m *EcdictMutation) Translation() (r string, exists bool) {
+	v := m.translation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTranslation returns the old translation value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldTranslation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTranslation is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTranslation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTranslation: %w", err)
+	}
+	return oldValue.Translation, nil
+}
+
+// ResetTranslation reset all changes of the "translation" field.
+func (m *EcdictMutation) ResetTranslation() {
+	m.translation = nil
+}
+
+// SetPos sets the pos field.
+func (m *EcdictMutation) SetPos(s string) {
+	m.pos = &s
+}
+
+// Pos returns the pos value in the mutation.
+func (m *EcdictMutation) Pos() (r string, exists bool) {
+	v := m.pos
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPos returns the old pos value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldPos(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPos is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPos requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPos: %w", err)
+	}
+	return oldValue.Pos, nil
+}
+
+// ResetPos reset all changes of the "pos" field.
+func (m *EcdictMutation) ResetPos() {
+	m.pos = nil
+}
+
+// SetCollins sets the collins field.
+func (m *EcdictMutation) SetCollins(i int) {
+	m.collins = &i
+	m.addcollins = nil
+}
+
+// Collins returns the collins value in the mutation.
+func (m *EcdictMutation) Collins() (r int, exists bool) {
+	v := m.collins
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCollins returns the old collins value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldCollins(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCollins is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCollins requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCollins: %w", err)
+	}
+	return oldValue.Collins, nil
+}
+
+// AddCollins adds i to collins.
+func (m *EcdictMutation) AddCollins(i int) {
+	if m.addcollins != nil {
+		*m.addcollins += i
+	} else {
+		m.addcollins = &i
+	}
+}
+
+// AddedCollins returns the value that was added to the collins field in this mutation.
+func (m *EcdictMutation) AddedCollins() (r int, exists bool) {
+	v := m.addcollins
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCollins reset all changes of the "collins" field.
+func (m *EcdictMutation) ResetCollins() {
+	m.collins = nil
+	m.addcollins = nil
+}
+
+// SetOxford sets the oxford field.
+func (m *EcdictMutation) SetOxford(i int) {
+	m.oxford = &i
+	m.addoxford = nil
+}
+
+// Oxford returns the oxford value in the mutation.
+func (m *EcdictMutation) Oxford() (r int, exists bool) {
+	v := m.oxford
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOxford returns the old oxford value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldOxford(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldOxford is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldOxford requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOxford: %w", err)
+	}
+	return oldValue.Oxford, nil
+}
+
+// AddOxford adds i to oxford.
+func (m *EcdictMutation) AddOxford(i int) {
+	if m.addoxford != nil {
+		*m.addoxford += i
+	} else {
+		m.addoxford = &i
+	}
+}
+
+// AddedOxford returns the value that was added to the oxford field in this mutation.
+func (m *EcdictMutation) AddedOxford() (r int, exists bool) {
+	v := m.addoxford
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOxford reset all changes of the "oxford" field.
+func (m *EcdictMutation) ResetOxford() {
+	m.oxford = nil
+	m.addoxford = nil
+}
+
+// SetTag sets the tag field.
+func (m *EcdictMutation) SetTag(s string) {
+	m.tag = &s
+}
+
+// Tag returns the tag value in the mutation.
+func (m *EcdictMutation) Tag() (r string, exists bool) {
+	v := m.tag
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTag returns the old tag value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldTag(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTag is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTag requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTag: %w", err)
+	}
+	return oldValue.Tag, nil
+}
+
+// ResetTag reset all changes of the "tag" field.
+func (m *EcdictMutation) ResetTag() {
+	m.tag = nil
+}
+
+// SetBnc sets the bnc field.
+func (m *EcdictMutation) SetBnc(i int) {
+	m.bnc = &i
+	m.addbnc = nil
+}
+
+// Bnc returns the bnc value in the mutation.
+func (m *EcdictMutation) Bnc() (r int, exists bool) {
+	v := m.bnc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBnc returns the old bnc value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldBnc(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldBnc is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldBnc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBnc: %w", err)
+	}
+	return oldValue.Bnc, nil
+}
+
+// AddBnc adds i to bnc.
+func (m *EcdictMutation) AddBnc(i int) {
+	if m.addbnc != nil {
+		*m.addbnc += i
+	} else {
+		m.addbnc = &i
+	}
+}
+
+// AddedBnc returns the value that was added to the bnc field in this mutation.
+func (m *EcdictMutation) AddedBnc() (r int, exists bool) {
+	v := m.addbnc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetBnc reset all changes of the "bnc" field.
+func (m *EcdictMutation) ResetBnc() {
+	m.bnc = nil
+	m.addbnc = nil
+}
+
+// SetFrq sets the frq field.
+func (m *EcdictMutation) SetFrq(i int) {
+	m.frq = &i
+	m.addfrq = nil
+}
+
+// Frq returns the frq value in the mutation.
+func (m *EcdictMutation) Frq() (r int, exists bool) {
+	v := m.frq
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFrq returns the old frq value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldFrq(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldFrq is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldFrq requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFrq: %w", err)
+	}
+	return oldValue.Frq, nil
+}
+
+// AddFrq adds i to frq.
+func (m *EcdictMutation) AddFrq(i int) {
+	if m.addfrq != nil {
+		*m.addfrq += i
+	} else {
+		m.addfrq = &i
+	}
+}
+
+// AddedFrq returns the value that was added to the frq field in this mutation.
+func (m *EcdictMutation) AddedFrq() (r int, exists bool) {
+	v := m.addfrq
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetFrq reset all changes of the "frq" field.
+func (m *EcdictMutation) ResetFrq() {
+	m.frq = nil
+	m.addfrq = nil
+}
+
+// SetExchange sets the exchange field.
+func (m *EcdictMutation) SetExchange(s string) {
+	m.exchange = &s
+}
+
+// Exchange returns the exchange value in the mutation.
+func (m *EcdictMutation) Exchange() (r string, exists bool) {
+	v := m.exchange
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExchange returns the old exchange value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldExchange(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldExchange is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldExchange requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExchange: %w", err)
+	}
+	return oldValue.Exchange, nil
+}
+
+// ResetExchange reset all changes of the "exchange" field.
+func (m *EcdictMutation) ResetExchange() {
+	m.exchange = nil
+}
+
+// SetDetail sets the detail field.
+func (m *EcdictMutation) SetDetail(s string) {
+	m.detail = &s
+}
+
+// Detail returns the detail value in the mutation.
+func (m *EcdictMutation) Detail() (r string, exists bool) {
+	v := m.detail
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDetail returns the old detail value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldDetail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDetail is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDetail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDetail: %w", err)
+	}
+	return oldValue.Detail, nil
+}
+
+// ResetDetail reset all changes of the "detail" field.
+func (m *EcdictMutation) ResetDetail() {
+	m.detail = nil
+}
+
+// SetAudio sets the audio field.
+func (m *EcdictMutation) SetAudio(s string) {
+	m.audio = &s
+}
+
+// Audio returns the audio value in the mutation.
+func (m *EcdictMutation) Audio() (r string, exists bool) {
+	v := m.audio
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAudio returns the old audio value of the Ecdict.
+// If the Ecdict object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *EcdictMutation) OldAudio(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldAudio is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldAudio requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAudio: %w", err)
+	}
+	return oldValue.Audio, nil
+}
+
+// ResetAudio reset all changes of the "audio" field.
+func (m *EcdictMutation) ResetAudio() {
+	m.audio = nil
+}
+
+// Op returns the operation name.
+func (m *EcdictMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Ecdict).
+func (m *EcdictMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *EcdictMutation) Fields() []string {
+	fields := make([]string, 0, 14)
+	if m.word != nil {
+		fields = append(fields, ecdict.FieldWord)
+	}
+	if m.sw != nil {
+		fields = append(fields, ecdict.FieldSw)
+	}
+	if m.phonetic != nil {
+		fields = append(fields, ecdict.FieldPhonetic)
+	}
+	if m.definition != nil {
+		fields = append(fields, ecdict.FieldDefinition)
+	}
+	if m.translation != nil {
+		fields = append(fields, ecdict.FieldTranslation)
+	}
+	if m.pos != nil {
+		fields = append(fields, ecdict.FieldPos)
+	}
+	if m.collins != nil {
+		fields = append(fields, ecdict.FieldCollins)
+	}
+	if m.oxford != nil {
+		fields = append(fields, ecdict.FieldOxford)
+	}
+	if m.tag != nil {
+		fields = append(fields, ecdict.FieldTag)
+	}
+	if m.bnc != nil {
+		fields = append(fields, ecdict.FieldBnc)
+	}
+	if m.frq != nil {
+		fields = append(fields, ecdict.FieldFrq)
+	}
+	if m.exchange != nil {
+		fields = append(fields, ecdict.FieldExchange)
+	}
+	if m.detail != nil {
+		fields = append(fields, ecdict.FieldDetail)
+	}
+	if m.audio != nil {
+		fields = append(fields, ecdict.FieldAudio)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *EcdictMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case ecdict.FieldWord:
+		return m.Word()
+	case ecdict.FieldSw:
+		return m.Sw()
+	case ecdict.FieldPhonetic:
+		return m.Phonetic()
+	case ecdict.FieldDefinition:
+		return m.Definition()
+	case ecdict.FieldTranslation:
+		return m.Translation()
+	case ecdict.FieldPos:
+		return m.Pos()
+	case ecdict.FieldCollins:
+		return m.Collins()
+	case ecdict.FieldOxford:
+		return m.Oxford()
+	case ecdict.FieldTag:
+		return m.Tag()
+	case ecdict.FieldBnc:
+		return m.Bnc()
+	case ecdict.FieldFrq:
+		return m.Frq()
+	case ecdict.FieldExchange:
+		return m.Exchange()
+	case ecdict.FieldDetail:
+		return m.Detail()
+	case ecdict.FieldAudio:
+		return m.Audio()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *EcdictMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case ecdict.FieldWord:
+		return m.OldWord(ctx)
+	case ecdict.FieldSw:
+		return m.OldSw(ctx)
+	case ecdict.FieldPhonetic:
+		return m.OldPhonetic(ctx)
+	case ecdict.FieldDefinition:
+		return m.OldDefinition(ctx)
+	case ecdict.FieldTranslation:
+		return m.OldTranslation(ctx)
+	case ecdict.FieldPos:
+		return m.OldPos(ctx)
+	case ecdict.FieldCollins:
+		return m.OldCollins(ctx)
+	case ecdict.FieldOxford:
+		return m.OldOxford(ctx)
+	case ecdict.FieldTag:
+		return m.OldTag(ctx)
+	case ecdict.FieldBnc:
+		return m.OldBnc(ctx)
+	case ecdict.FieldFrq:
+		return m.OldFrq(ctx)
+	case ecdict.FieldExchange:
+		return m.OldExchange(ctx)
+	case ecdict.FieldDetail:
+		return m.OldDetail(ctx)
+	case ecdict.FieldAudio:
+		return m.OldAudio(ctx)
+	}
+	return nil, fmt.Errorf("unknown Ecdict field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *EcdictMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case ecdict.FieldWord:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWord(v)
+		return nil
+	case ecdict.FieldSw:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSw(v)
+		return nil
+	case ecdict.FieldPhonetic:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhonetic(v)
+		return nil
+	case ecdict.FieldDefinition:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDefinition(v)
+		return nil
+	case ecdict.FieldTranslation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTranslation(v)
+		return nil
+	case ecdict.FieldPos:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPos(v)
+		return nil
+	case ecdict.FieldCollins:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCollins(v)
+		return nil
+	case ecdict.FieldOxford:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOxford(v)
+		return nil
+	case ecdict.FieldTag:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTag(v)
+		return nil
+	case ecdict.FieldBnc:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBnc(v)
+		return nil
+	case ecdict.FieldFrq:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFrq(v)
+		return nil
+	case ecdict.FieldExchange:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExchange(v)
+		return nil
+	case ecdict.FieldDetail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDetail(v)
+		return nil
+	case ecdict.FieldAudio:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAudio(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Ecdict field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *EcdictMutation) AddedFields() []string {
+	var fields []string
+	if m.addcollins != nil {
+		fields = append(fields, ecdict.FieldCollins)
+	}
+	if m.addoxford != nil {
+		fields = append(fields, ecdict.FieldOxford)
+	}
+	if m.addbnc != nil {
+		fields = append(fields, ecdict.FieldBnc)
+	}
+	if m.addfrq != nil {
+		fields = append(fields, ecdict.FieldFrq)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *EcdictMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case ecdict.FieldCollins:
+		return m.AddedCollins()
+	case ecdict.FieldOxford:
+		return m.AddedOxford()
+	case ecdict.FieldBnc:
+		return m.AddedBnc()
+	case ecdict.FieldFrq:
+		return m.AddedFrq()
+	}
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *EcdictMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case ecdict.FieldCollins:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCollins(v)
+		return nil
+	case ecdict.FieldOxford:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOxford(v)
+		return nil
+	case ecdict.FieldBnc:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBnc(v)
+		return nil
+	case ecdict.FieldFrq:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFrq(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Ecdict numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *EcdictMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *EcdictMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *EcdictMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Ecdict nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *EcdictMutation) ResetField(name string) error {
+	switch name {
+	case ecdict.FieldWord:
+		m.ResetWord()
+		return nil
+	case ecdict.FieldSw:
+		m.ResetSw()
+		return nil
+	case ecdict.FieldPhonetic:
+		m.ResetPhonetic()
+		return nil
+	case ecdict.FieldDefinition:
+		m.ResetDefinition()
+		return nil
+	case ecdict.FieldTranslation:
+		m.ResetTranslation()
+		return nil
+	case ecdict.FieldPos:
+		m.ResetPos()
+		return nil
+	case ecdict.FieldCollins:
+		m.ResetCollins()
+		return nil
+	case ecdict.FieldOxford:
+		m.ResetOxford()
+		return nil
+	case ecdict.FieldTag:
+		m.ResetTag()
+		return nil
+	case ecdict.FieldBnc:
+		m.ResetBnc()
+		return nil
+	case ecdict.FieldFrq:
+		m.ResetFrq()
+		return nil
+	case ecdict.FieldExchange:
+		m.ResetExchange()
+		return nil
+	case ecdict.FieldDetail:
+		m.ResetDetail()
+		return nil
+	case ecdict.FieldAudio:
+		m.ResetAudio()
+		return nil
+	}
+	return fmt.Errorf("unknown Ecdict field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *EcdictMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *EcdictMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *EcdictMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *EcdictMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *EcdictMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *EcdictMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *EcdictMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Ecdict unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *EcdictMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Ecdict edge %s", name)
+}
 
 // UserMutation represents an operation that mutate the Users
 // nodes in the graph.

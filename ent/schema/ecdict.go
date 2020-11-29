@@ -13,19 +13,20 @@ type Ecdict struct {
 // Fields of the Ecdict.
 func (Ecdict) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("word").Positive(),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
-		field.String(""),
+		field.String("word"),
+		field.String("sw"),
+		field.String("phonetic"),
+		field.String("definition"),
+		field.String("translation"),
+		field.String("pos"),
+		field.Int("collins"),
+		field.Int("oxford"),
+		field.String("tag"),
+		field.Int("bnc"),
+		field.Int("frq"),
+		field.String("exchange"),
+		field.String("detail"),
+		field.String("audio"),
 	}
 }
 

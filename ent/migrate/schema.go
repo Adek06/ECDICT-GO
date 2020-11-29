@@ -8,6 +8,31 @@ import (
 )
 
 var (
+	// EcdictsColumns holds the columns for the "ecdicts" table.
+	EcdictsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "word", Type: field.TypeString},
+		{Name: "sw", Type: field.TypeString},
+		{Name: "phonetic", Type: field.TypeString},
+		{Name: "definition", Type: field.TypeString},
+		{Name: "translation", Type: field.TypeString},
+		{Name: "pos", Type: field.TypeString},
+		{Name: "collins", Type: field.TypeInt},
+		{Name: "oxford", Type: field.TypeInt},
+		{Name: "tag", Type: field.TypeString},
+		{Name: "bnc", Type: field.TypeInt},
+		{Name: "frq", Type: field.TypeInt},
+		{Name: "exchange", Type: field.TypeString},
+		{Name: "detail", Type: field.TypeString},
+		{Name: "audio", Type: field.TypeString},
+	}
+	// EcdictsTable holds the schema information for the "ecdicts" table.
+	EcdictsTable = &schema.Table{
+		Name:        "ecdicts",
+		Columns:     EcdictsColumns,
+		PrimaryKey:  []*schema.Column{EcdictsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -23,6 +48,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		EcdictsTable,
 		UsersTable,
 	}
 )

@@ -9,6 +9,7 @@ import (
 
 	"ECDICT-GO/ent/migrate"
 
+	"ECDICT-GO/ent/ecdict"
 	"ECDICT-GO/ent/user"
 
 	"github.com/facebook/ent/dialect"
@@ -20,6 +21,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Ecdict is the client for interacting with the Ecdict builders.
+	Ecdict *EcdictClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -35,6 +38,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Ecdict = NewEcdictClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -68,6 +72,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
+		Ecdict: NewEcdictClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -84,6 +89,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := config{driver: &txDriver{tx: tx, drv: c.driver}, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
 		config: cfg,
+		Ecdict: NewEcdictClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -91,7 +97,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		Ecdict.
 //		Query().
 //		Count(ctx)
 //
@@ -113,7 +119,96 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Ecdict.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// EcdictClient is a client for the Ecdict schema.
+type EcdictClient struct {
+	config
+}
+
+// NewEcdictClient returns a client for the Ecdict from the given config.
+func NewEcdictClient(c config) *EcdictClient {
+	return &EcdictClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `ecdict.Hooks(f(g(h())))`.
+func (c *EcdictClient) Use(hooks ...Hook) {
+	c.hooks.Ecdict = append(c.hooks.Ecdict, hooks...)
+}
+
+// Create returns a create builder for Ecdict.
+func (c *EcdictClient) Create() *EcdictCreate {
+	mutation := newEcdictMutation(c.config, OpCreate)
+	return &EcdictCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// BulkCreate returns a builder for creating a bulk of Ecdict entities.
+func (c *EcdictClient) CreateBulk(builders ...*EcdictCreate) *EcdictCreateBulk {
+	return &EcdictCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Ecdict.
+func (c *EcdictClient) Update() *EcdictUpdate {
+	mutation := newEcdictMutation(c.config, OpUpdate)
+	return &EcdictUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EcdictClient) UpdateOne(e *Ecdict) *EcdictUpdateOne {
+	mutation := newEcdictMutation(c.config, OpUpdateOne, withEcdict(e))
+	return &EcdictUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EcdictClient) UpdateOneID(id int) *EcdictUpdateOne {
+	mutation := newEcdictMutation(c.config, OpUpdateOne, withEcdictID(id))
+	return &EcdictUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Ecdict.
+func (c *EcdictClient) Delete() *EcdictDelete {
+	mutation := newEcdictMutation(c.config, OpDelete)
+	return &EcdictDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EcdictClient) DeleteOne(e *Ecdict) *EcdictDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EcdictClient) DeleteOneID(id int) *EcdictDeleteOne {
+	builder := c.Delete().Where(ecdict.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EcdictDeleteOne{builder}
+}
+
+// Query returns a query builder for Ecdict.
+func (c *EcdictClient) Query() *EcdictQuery {
+	return &EcdictQuery{config: c.config}
+}
+
+// Get returns a Ecdict entity by its id.
+func (c *EcdictClient) Get(ctx context.Context, id int) (*Ecdict, error) {
+	return c.Query().Where(ecdict.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EcdictClient) GetX(ctx context.Context, id int) *Ecdict {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EcdictClient) Hooks() []Hook {
+	return c.hooks.Ecdict
 }
 
 // UserClient is a client for the User schema.
